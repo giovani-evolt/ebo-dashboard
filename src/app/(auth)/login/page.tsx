@@ -1,4 +1,4 @@
-import Signin from "@/components/Auth/Signin";
+import SigninWithPassword from "@/components/Auth/SigninWithPassword";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import type { Metadata } from "next";
 import Image from "next/image";
@@ -8,16 +8,30 @@ export const metadata: Metadata = {
   title: "Sign in",
 };
 
-export default function SignIn() {
+export default function Login() {
   return (
     <>
-      <Breadcrumb pageName="Sign In" />
+      <Breadcrumb pageName="Login" />
 
       <div className="rounded-[10px] bg-white shadow-1 dark:bg-gray-dark dark:shadow-card">
         <div className="flex flex-wrap items-center">
           <div className="w-full xl:w-1/2">
             <div className="w-full p-4 sm:p-12.5 xl:p-15">
-              <Signin />
+              <span className="mb-1.5 block font-medium">Start for free</span>
+              <h2 className="mb-9 text-2xl font-bold text-dark dark:text-white sm:text-title-xl2">
+                Sign In to Admin Dashboard
+              </h2>
+
+              <SigninWithPassword />
+
+              <div className="mt-6 text-center">
+                <p>
+                  Don't have an account?{" "}
+                  <Link href="/auth/signup" className="text-primary hover:underline">
+                    Sign up
+                  </Link>
+                </p>
+              </div>
             </div>
           </div>
 

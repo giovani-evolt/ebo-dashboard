@@ -1,12 +1,11 @@
+"use client";
+
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { CampaignVisitors } from "@/components/Charts/campaign-visitors";
 import { UsedDevices } from "@/components/Charts/used-devices";
 import { createTimeFrameExtractor } from "@/utils/timeframe-extractor";
-import { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "Basic Chart",
-};
+import { ProtectedRoute } from "@/components/Auth/ProtectedRoute";
+import { use } from "react";
 
 type PropsType = {
   searchParams: Promise<{
@@ -14,12 +13,12 @@ type PropsType = {
   }>;
 };
 
-export default async function Page(props: PropsType) {
-  const { selected_time_frame } = await props.searchParams;
+export default function Page(props: PropsType) {
+  const { selected_time_frame } = use(props.searchParams);
   const extractTimeFrame = createTimeFrameExtractor(selected_time_frame);
 
   return (
-    <>
+    <ProtectedRoute>
       <Breadcrumb pageName="Basic Chart" />
 
       <div className="grid grid-cols-12 gap-4 md:gap-6 2xl:gap-7.5">
@@ -33,6 +32,6 @@ export default async function Page(props: PropsType) {
           <CampaignVisitors />
         </div>
       </div>
-    </>
+    </ProtectedRoute>
   );
 }

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+"use client";
 
 import { GlobeIcon } from "@/assets/icons";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
@@ -12,14 +12,11 @@ import { RadioInput } from "@/components/FormElements/radio";
 import { Select } from "@/components/FormElements/select";
 import { Switch } from "@/components/FormElements/switch";
 import { ShowcaseSection } from "@/components/Layouts/showcase-section";
-
-export const metadata: Metadata = {
-  title: "Form Elements",
-};
+import { ProtectedRoute } from "@/components/Auth/ProtectedRoute";
 
 export default function FormElementsPage() {
   return (
-    <>
+    <ProtectedRoute>
       <Breadcrumb pageName="Form Elements" />
 
       <div className="grid grid-cols-1 gap-9 sm:grid-cols-2">
@@ -124,6 +121,6 @@ export default function FormElementsPage() {
           </ShowcaseSection>
         </div>
       </div>
-    </>
+    </ProtectedRoute>
   );
 }

@@ -1,7 +1,11 @@
 import * as logos from "@/assets/logos";
+import { apiClient } from "@/lib/api-client";
 
 export async function getTopProducts() {
-  // Fake delay
+  // Example: Replace with actual API call when backend is ready
+  // return apiClient.get('/api/products/top');
+  
+  // Fake delay to simulate API call
   await new Promise((resolve) => setTimeout(resolve, 2000));
 
   return [
@@ -41,7 +45,10 @@ export async function getTopProducts() {
 }
 
 export async function getInvoiceTableData() {
-  // Fake delay
+  // Example: Replace with actual API call when backend is ready
+  // return apiClient.get('/api/invoices');
+  
+  // Fake delay to simulate API call
   await new Promise((resolve) => setTimeout(resolve, 1400));
 
   return [
@@ -73,7 +80,61 @@ export async function getInvoiceTableData() {
 }
 
 export async function getTopChannels() {
-  // Fake delay
+  // Example: Replace with actual API call when backend is ready
+  // return apiClient.get('/api/channels/top');
+  
+  // Fake delay to simulate API call
+  await new Promise((resolve) => setTimeout(resolve, 1500));
+
+  return [
+    {
+      name: "Google",
+      visitors: 3456,
+      revenues: 4220,
+      sales: 3456,
+      conversion: 2.59,
+      logo: logos.google,
+    },
+    {
+      name: "X.com",
+      visitors: 3456,
+      revenues: 4220,
+      sales: 3456,
+      conversion: 2.59,
+      logo: logos.x,
+    },
+    {
+      name: "Github",
+      visitors: 3456,
+      revenues: 4220,
+      sales: 3456,
+      conversion: 2.59,
+      logo: logos.github,
+    },
+    {
+      name: "Vimeo",
+      visitors: 3456,
+      revenues: 4220,
+      sales: 3456,
+      conversion: 2.59,
+      logo: logos.vimeo,
+    },
+    {
+      name: "Facebook",
+      visitors: 3456,
+      revenues: 4220,
+      sales: 3456,
+      conversion: 2.59,
+      logo: logos.facebook,
+    },
+  ];
+}
+
+export async function getSettlements() {
+  // Example: Replace with actual API call when backend is ready
+  // return apiClient.get('/api/settlements');
+  
+  // Fake delay to simulate API call
   await new Promise((resolve) => setTimeout(resolve, 1500));
 
   return [

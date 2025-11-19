@@ -1,6 +1,7 @@
 "use client";
 
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
+import { ProtectedRoute } from "@/components/Auth/ProtectedRoute";
 import Image from "next/image";
 
 import { useState } from "react";
@@ -8,6 +9,14 @@ import { CameraIcon } from "./_components/icons";
 import { SocialAccounts } from "./_components/social-accounts";
 
 export default function Page() {
+  return (
+    <ProtectedRoute>
+      <ProfileContent />
+    </ProtectedRoute>
+  );
+}
+
+function ProfileContent() {
   const [data, setData] = useState({
     name: "Danish Heilium",
     profilePhoto: "/images/user/user-03.png",
@@ -152,3 +161,4 @@ export default function Page() {
     </div>
   );
 }
+

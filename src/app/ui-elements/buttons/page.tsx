@@ -1,16 +1,14 @@
+"use client";
+
 import { MessageOutlineIcon } from "@/assets/icons";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { ShowcaseSection } from "@/components/Layouts/showcase-section";
 import { Button } from "@/components/ui-elements/button";
-import { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "Buttons",
-};
+import { ProtectedRoute } from "@/components/Auth/ProtectedRoute";
 
 export default function Page() {
   return (
-    <>
+    <ProtectedRoute>
       <Breadcrumb pageName="Buttons" />
 
       <div className="space-y-10">
@@ -128,6 +126,6 @@ export default function Page() {
           </div>
         </ShowcaseSection>
       </div>
-    </>
+    </ProtectedRoute>
   );
 }

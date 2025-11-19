@@ -1,7 +1,19 @@
+import { apiClient } from '@/lib/api-client';
+import type {
+  FinancialData,
+  PaymentsOverviewData,
+  WeeksProfitData,
+  DeviceUsedData,
+  CampaignVisitorsData,
+  CostsPerInteractionData,
+  ChartDataPoint,
+} from '@/types/charts.types';
+
 export async function getDevicesUsedData(
   timeFrame?: "monthly" | "yearly" | (string & {}),
-) {
-  // Fake delay
+): Promise<DeviceUsedData[]> {
+  // Example: Replace with actual API call when backend is ready
+  // Fake delay to simulate API call
   await new Promise((resolve) => setTimeout(resolve, 1000));
 
   const data = [
@@ -37,10 +49,99 @@ export async function getDevicesUsedData(
   return data;
 }
 
+export async function getFinancialInformationData(): Promise<FinancialData> {
+  const json = await apiClient.get<any>('/transaction_totals');
+
+  const graph: FinancialData = {
+    gross: [],
+    taxes: [],
+    frsh: [],
+    disc: []
+  };
+
+  json.member.forEach((element: any) => {
+    switch(element.type){
+      case 'GRSS':
+        const dataPoint: ChartDataPoint = {
+          x: 1,
+          y: 2
+        };
+        graph.gross.push(dataPoint);
+        break;
+    }
+  });
+  
+  console.log(graph);
+
+  return graph as FinancialData;
+    /*return {
+      gross: [
+        { x: "Jan", y: 0 },
+        { x: "Feb", y: 20 },
+        { x: "Mar", y: 35 },
+        { x: "Apr", y: 45 },
+        { x: "May", y: 35 },
+        { x: "Jun", y: 55 },
+        { x: "Jul", y: 65 },
+        { x: "Aug", y: 50 },
+        { x: "Sep", y: 65 },
+        { x: "Oct", y: 75 },
+        { x: "Nov", y: 60 },
+        { x: "Dec", y: 75 },
+      ],
+      taxes: [
+        { x: "Jan", y: 15 },
+        { x: "Feb", y: 9 },
+        { x: "Mar", y: 17 },
+        { x: "Apr", y: 32 },
+        { x: "May", y: 25 },
+        { x: "Jun", y: 68 },
+        { x: "Jul", y: 80 },
+        { x: "Aug", y: 68 },
+        { x: "Sep", y: 84 },
+        { x: "Oct", y: 94 },
+        { x: "Nov", y: 74 },
+        { x: "Dec", y: 62 },
+      ],
+      frsh: [
+        { x: "Jan", y: 5 },
+        { x: "Feb", y: 69 },
+        { x: "Mar", y: 47 },
+        { x: "Apr", y: 22 },
+        { x: "May", y: 85 },
+        { x: "Jun", y: 78 },
+        { x: "Jul", y: 18 },
+        { x: "Aug", y: 66 },
+        { x: "Sep", y: 88 },
+        { x: "Oct", y: 79 },
+        { x: "Nov", y: 57 },
+        { x: "Dec", y: 32 },
+      ],
+      disc: [
+        { x: "Jan", y: 10 },
+        { x: "Feb", y: 20 },
+        { x: "Mar", y: 30 },
+        { x: "Apr", y: 62 },
+        { x: "May", y: 23 },
+        { x: "Jun", y: 28 },
+        { x: "Jul", y: 10 },
+        { x: "Aug", y: 48 },
+        { x: "Sep", y: 24 },
+        { x: "Oct", y: 14 },
+        { x: "Nov", y: 24 },
+        { x: "Dec", y: 12 },
+      ],
+    };
+  }*/
+}
+
 export async function getPaymentsOverviewData(
   timeFrame?: "monthly" | "yearly" | (string & {}),
-) {
-  // Fake delay
+): Promise<PaymentsOverviewData> {
+  // Example: Replace with actual API call when backend is ready
+  // return apiClient.get('/api/analytics/payments', { params: { timeFrame } });
+  
+  // Fake delay to simulate API call
   await new Promise((resolve) => setTimeout(resolve, 1000));
 
   if (timeFrame === "yearly") {
@@ -94,8 +195,11 @@ export async function getPaymentsOverviewData(
   };
 }
 
-export async function getWeeksProfitData(timeFrame?: string) {
-  // Fake delay
+export async function getWeeksProfitData(timeFrame?: string): Promise<WeeksProfitData> {
+  // Example: Replace with actual API call when backend is ready
+  // return apiClient.get('/api/analytics/profit', { params: { timeFrame } });
+  
+  // Fake delay to simulate API call
   await new Promise((resolve) => setTimeout(resolve, 1000));
 
   if (timeFrame === "last week") {
@@ -143,8 +247,11 @@ export async function getWeeksProfitData(timeFrame?: string) {
   };
 }
 
-export async function getCampaignVisitorsData() {
-  // Fake delay
+export async function getCampaignVisitorsData(): Promise<CampaignVisitorsData> {
+  // Example: Replace with actual API call when backend is ready
+  // return apiClient.get('/api/analytics/campaign-visitors');
+  
+  // Fake delay to simulate API call
   await new Promise((resolve) => setTimeout(resolve, 1000));
 
   return {
@@ -162,9 +269,11 @@ export async function getCampaignVisitorsData() {
   };
 }
 
-export async function getVisitorsAnalyticsData() {
-  // Fake delay
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+export async function getVisitorsAnalyticsData(): Promise<ChartDataPoint[]> {
+  // Example: Replace with actual API call when backend is ready
+  // return apiClient.get('/api/analytics/visitors');
+  
+  // Fake dela
 
   return [
     168, 385, 201, 298, 187, 195, 291, 110, 215, 390, 280, 112, 123, 212, 270,
@@ -172,7 +281,7 @@ export async function getVisitorsAnalyticsData() {
   ].map((value, index) => ({ x: index + 1 + "", y: value }));
 }
 
-export async function getCostsPerInteractionData() {
+export async function getCostsPerInteractionData(): Promise<CostsPerInteractionData> {
   return {
     avg_cost: 560.93,
     growth: 2.5,

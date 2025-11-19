@@ -1,19 +1,15 @@
+"use client";
+
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import CalendarBox from "@/components/CalenderBox";
-import { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "Calender Page",
-  // other metadata
-};
+import { ProtectedRoute } from "@/components/Auth/ProtectedRoute";
 
 const CalendarPage = () => {
   return (
-    <>
+    <ProtectedRoute>
       <Breadcrumb pageName="Calendar" />
-
       <CalendarBox />
-    </>
+    </ProtectedRoute>
   );
 };
 
