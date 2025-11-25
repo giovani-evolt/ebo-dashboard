@@ -35,7 +35,7 @@ export interface User {
   /** Account creation timestamp (optional) */
   createdAt?: string;
   /** Seller's name */
-  Seller: string;
+  seller: string;
 }
 
 /**

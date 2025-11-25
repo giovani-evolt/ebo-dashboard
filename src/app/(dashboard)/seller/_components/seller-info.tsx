@@ -1,82 +1,127 @@
-import {
-  CallIcon,
-  EmailIcon,
-  PencilSquareIcon,
-  UserIcon,
-} from "@/assets/icons";
+"use client";
+
+import { EmailIcon, UserIcon } from "@/assets/icons";
 import InputGroup from "@/components/FormElements/InputGroup";
-import { TextAreaGroup } from "@/components/FormElements/InputGroup/text-area";
 import { ShowcaseSection } from "@/components/Layouts/showcase-section";
 import { useAuth } from "@/contexts/auth-context";
+import { apiClient } from "@/lib/api-client";
+import { useEffect, useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+
+interface SellerData {
+  id: string;
+  name: string;
+  createdAt: string;
+}
 
 export function SellerInfoForm() {
-  const { user, seller } = useAuth();
+  const { user } = useAuth();
+  const [sellerData, setSellerData] = useState<SellerData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+
+    console.log(user);
+
+    const fetchSellerData = async () => {
+      if (!user?.seller) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        setError(null);
+        const data = await apiClient.get<SellerData>(user.seller);
+        console.log(data)
+        setSellerData(data);
+      } catch (err: any) {
+        console.error("Error fetching seller data:", err);
+        setError(err.message || "Error al cargar información del seller");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSellerData();
+  }, [user?.Seller]);
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("es-ES", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
 
   return (
-    <ShowcaseSection title="Personal Information" className="!p-7">
-      <form>
-        <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
+    <ShowcaseSection title="Seller Information" className="!p-7">
+      {isLoading ? (
+        <div className="space-y-5.5">
+          <div className="flex flex-col gap-5.5 sm:flex-row">
+            <div className="w-full sm:w-1/2">
+              <Skeleton className="mb-2 h-4 w-24" />
+              <Skeleton className="h-11 w-full" />
+            </div>
+            <div className="w-full sm:w-1/2">
+              <Skeleton className="mb-2 h-4 w-24" />
+              <Skeleton className="h-11 w-full" />
+            </div>
+          </div>
+          <div>
+            <Skeleton className="mb-2 h-4 w-24" />
+            <Skeleton className="h-11 w-full" />
+          </div>
+        </div>
+      ) : error ? (
+        <div className="rounded-lg bg-red-50 p-4 text-red-600 dark:bg-red-900/20 dark:text-red-400">
+          {error}
+        </div>
+      ) : (
+        <div>
+          <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
+            <InputGroup
+              className="w-full sm:w-1/2"
+              type="text"
+              name="sellerName"
+              label="Seller Name"
+              placeholder="Seller Name"
+              value={sellerData?.name || ""}
+              icon={<UserIcon />}
+              iconPosition="left"
+              height="sm"
+              disabled
+            />
+
+            <InputGroup
+              className="w-full sm:w-1/2"
+              type="text"
+              name="createdAt"
+              label="Created At"
+              placeholder="Creation Date"
+              value={sellerData?.createdAt ? formatDate(sellerData.createdAt) : ""}
+              icon={<UserIcon />}
+              iconPosition="left"
+              height="sm"
+              disabled
+            />
+          </div>
+
           <InputGroup
-            className="w-full sm:w-1/2"
-            type="text"
-            name="Seller"
-            label="Seller Name"
-            placeholder="Seller Name"
-            value={user?.seller}
-            icon={<UserIcon />}
+            className="mb-5.5"
+            type="email"
+            name="email"
+            label="Email Address"
+            placeholder="user@gmail.com"
+            value={user?.email || ""}
+            icon={<EmailIcon />}
             iconPosition="left"
             height="sm"
-          />
-
-          <InputGroup
-            className="w-full sm:w-1/2"
-            type="text"
-            name="fullName"
-            label="Full Name"
-            placeholder="User Name"
-            value={user?.lastName}
-            icon={<UserIcon />}
-            iconPosition="left"
-            height="sm"
+            disabled
           />
         </div>
-
-        <InputGroup
-          className="mb-5.5"
-          type="email"
-          name="email"
-          label="Email Address"
-          placeholder="user@gmail.com"
-          value={user?.email}
-          icon={<EmailIcon />}
-          iconPosition="left"
-          height="sm"
-        />
-
-        {/* <TextAreaGroup
-          className="mb-5.5"
-          label="BIO"
-          placeholder="Write your bio here"
-          icon={<PencilSquareIcon />}
-          defaultValue="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam lacinia turpis tortor, consequat efficitur mi congue a. Curabitur cursus, ipsum ut lobortis sodales, enim arcu pellentesque lectus ac suscipit diam sem a felis. Cras sapien ex, blandit eu dui et suscipit gravida nunc. Sed sed est quis dui."
-        /> */}
-
-        <div className="flex justify-end gap-3">
-          <button
-            className="rounded-lg border border-stroke px-6 py-[7px] font-medium text-dark hover:shadow-1 dark:border-dark-3 dark:text-white"
-            type="button"
-          >
-            Cancel
-          </button>
-
-          <button
-            className="rounded-lg bg-primary px-6 py-[7px] font-medium text-gray-2 hover:bg-opacity-90"
-            type="submit"
-          >
-            Save
-          </button>
-        </div>
-      </form>
+      )}
     </ShowcaseSection>
   );
 }
