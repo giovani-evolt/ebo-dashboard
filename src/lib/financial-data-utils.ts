@@ -51,7 +51,7 @@ function isValidChartDataPoint(point: any): point is ChartDataPoint {
     return false;
   }
 
-  const hasValidX = typeof point.x === "string" || typeof point.x === "number";
+  const hasValidX = typeof point.x === "string";
   const hasValidY = typeof point.y === "number";
 
   return hasValidX && hasValidY;

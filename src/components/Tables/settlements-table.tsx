@@ -10,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import dayjs from "dayjs";
 import { TrashIcon } from "@/assets/icons";
 import { DownloadIcon, PreviewIcon } from "../Tables/icons";
@@ -47,23 +48,64 @@ export function SettlementsTable() {
   const [settlements, setSettlements] = useState<Settlement[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deleteDialog, setDeleteDialog] = useState<{
+    isOpen: boolean;
+    settlement: Settlement | null;
+  }>({ isOpen: false, settlement: null });
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const fetchSettlements = async () => {
+    try {
+      setIsLoading(true);
+      const response = await apiClient.get<SettlementsResponse>("/api/csvs");
+      setSettlements(response.member || []);
+      setError(null);
+    } catch (err) {
+      console.error("Failed to fetch settlements:", err);
+      setError("Failed to load settlements");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    async function fetchSettlements() {
-      try {
-        setIsLoading(true);
-        const response = await apiClient.get<SettlementsResponse>("/csvs");
-        setSettlements(response.member || []);
-      } catch (err) {
-        console.error("Failed to fetch settlements:", err);
-        setError("Failed to load settlements");
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
     fetchSettlements();
   }, []);
+
+  const handleDeleteClick = (settlement: Settlement) => {
+    setDeleteDialog({ isOpen: true, settlement });
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteDialog.settlement) return;
+
+    try {
+      setIsDeleting(true);
+      // Extract ID from @id (e.g., "/api/csvs/1" -> "1")
+      const id = deleteDialog.settlement["@id"].split("/").pop();
+
+      console.log(deleteDialog.settlement);
+
+      await apiClient.delete(deleteDialog.settlement["@id"]);
+      
+      // Close dialog
+      setDeleteDialog({ isOpen: false, settlement: null });
+      
+      // Refresh the list
+      await fetchSettlements();
+    } catch (err) {
+      console.error("Failed to delete settlement:", err);
+      setError("Failed to delete settlement. Please try again.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    if (!isDeleting) {
+      setDeleteDialog({ isOpen: false, settlement: null });
+    }
+  };
 
   if (isLoading) {
     return (
@@ -139,7 +181,10 @@ export function SettlementsTable() {
                     <PreviewIcon />
                   </button>
 
-                  <button className="hover:text-primary">
+                  <button
+                    onClick={() => handleDeleteClick(settlement)}
+                    className="hover:text-red-600"
+                  >
                     <span className="sr-only">Delete Settlement</span>
                     <TrashIcon />
                   </button>
@@ -154,6 +199,17 @@ export function SettlementsTable() {
           ))}
         </TableBody>
       </Table>
+
+      <ConfirmDialog
+        isOpen={deleteDialog.isOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Settlement"
+        message={`Are you sure you want to delete "${deleteDialog.settlement?.filename}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        isLoading={isDeleting}
+      />
     </div>
   );
 }

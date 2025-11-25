@@ -83,12 +83,12 @@ export default function SigninWithPassword() {
     try {
       // Call login method from Auth Context
       await login({
-        email: data.email,
+        username: data.email,
         password: data.password,
       });
 
       // Redirect to dashboard on successful login
-      router.push("/dashboard");
+      router.push("/");
     } catch (error: any) {
       // Handle API errors
       if (error.statusCode === 401) {

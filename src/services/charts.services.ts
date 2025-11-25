@@ -9,6 +9,8 @@ import type {
   ChartDataPoint,
 } from '@/types/charts.types';
 
+import { standardMonth } from "@/lib/format-number";
+
 export async function getDevicesUsedData(
   timeFrame?: "monthly" | "yearly" | (string & {}),
 ): Promise<DeviceUsedData[]> {
@@ -50,7 +52,7 @@ export async function getDevicesUsedData(
 }
 
 export async function getFinancialInformationData(): Promise<FinancialData> {
-  const json = await apiClient.get<any>('/transaction_totals');
+  const json = await apiClient.get<any>('/api/transaction_totals');
 
   const graph: FinancialData = {
     gross: [],
@@ -59,20 +61,29 @@ export async function getFinancialInformationData(): Promise<FinancialData> {
     disc: []
   };
 
+  console.log(json);
+
   json.member.forEach((element: any) => {
-    switch(element.type){
+    const dp: ChartDataPoint = {
+      x: standardMonth(element.month),
+      y: parseFloat(element.totalAmount)
+    };
+    switch(element.totalType){
       case 'GRSS':
-        const dataPoint: ChartDataPoint = {
-          x: 1,
-          y: 2
-        };
-        graph.gross.push(dataPoint);
+        graph.gross.push(dp);
+        break;
+      case 'TXS':
+        graph.taxes.push(dp);
+        break;
+      case 'FRSH':
+        graph.frsh.push(dp);
+        break;
+      case 'DSCN':
+        graph.disc.push(dp);
         break;
     }
   });
   
-  console.log(graph);
-
   return graph as FinancialData;
     /*return {
       gross: [

@@ -12,37 +12,11 @@ import Link from "next/link";
 import { useState } from "react";
 import { BellIcon } from "./icons";
 
-const notificationList = [
-  {
-    image: "/images/user/user-15.png",
-    title: "Piter Joined the Team!",
-    subTitle: "Congratulate him",
-  },
-  {
-    image: "/images/user/user-03.png",
-    title: "New message",
-    subTitle: "Devid sent a new message",
-  },
-  {
-    image: "/images/user/user-26.png",
-    title: "New Payment received",
-    subTitle: "Check your earnings",
-  },
-  {
-    image: "/images/user/user-28.png",
-    title: "Jolly completed tasks",
-    subTitle: "Assign new task",
-  },
-  {
-    image: "/images/user/user-27.png",
-    title: "Roman Joined the Team!",
-    subTitle: "Congratulate him",
-  },
-];
+const notificationList: any[] = [];
 
 export function Notification() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isDotVisible, setIsDotVisible] = useState(true);
+  const [isDotVisible, setIsDotVisible] = useState(false);
   const isMobile = useIsMobile();
 
   return (
@@ -82,7 +56,7 @@ export function Notification() {
             Notifications
           </span>
           <span className="rounded-md bg-primary px-[9px] py-0.5 text-xs font-medium text-white">
-            5 new
+            { notificationList.length }
           </span>
         </div>
 

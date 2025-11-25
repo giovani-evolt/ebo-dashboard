@@ -27,7 +27,7 @@ export default function Login() {
               <div className="mt-6 text-center">
                 <p>
                   Don't have an account?{" "}
-                  <Link href="/auth/signup" className="text-primary hover:underline">
+                  <Link href="/signup" className="text-primary hover:underline">
                     Sign up
                   </Link>
                 </p>
@@ -39,16 +39,8 @@ export default function Login() {
             <div className="custom-gradient-1 overflow-hidden rounded-2xl px-12.5 pt-12.5 dark:!bg-dark-2 dark:bg-none">
               <Link className="mb-10 inline-block" href="/">
                 <Image
-                  className="hidden dark:block"
-                  src={"/images/logo/logo.svg"}
-                  alt="Logo"
-                  width={176}
-                  height={32}
-                />
-                <Image
-                  className="dark:hidden"
-                  src={"/images/logo/logo-dark.svg"}
-                  alt="Logo"
+                  src={"/images/logo/evolt-logo.webp"}
+                  alt="Evolt Logo"
                   width={176}
                   height={32}
                 />

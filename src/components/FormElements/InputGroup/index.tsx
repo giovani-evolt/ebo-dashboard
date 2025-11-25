@@ -11,12 +11,15 @@ type InputGroupProps = {
   disabled?: boolean;
   active?: boolean;
   handleChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   value?: string;
   name?: string;
   icon?: React.ReactNode;
   iconPosition?: "left" | "right";
   height?: "sm" | "default";
   defaultValue?: string;
+  isValid?: boolean;
+  isInvalid?: boolean;
 };
 
 const InputGroup: React.FC<InputGroupProps> = ({
@@ -28,7 +31,10 @@ const InputGroup: React.FC<InputGroupProps> = ({
   disabled,
   active,
   handleChange,
+  handleBlur,
   icon,
+  isValid,
+  isInvalid,
   ...props
 }) => {
   const id = useId();
@@ -57,6 +63,7 @@ const InputGroup: React.FC<InputGroupProps> = ({
           name={props.name}
           placeholder={placeholder}
           onChange={handleChange}
+          onBlur={handleBlur}
           value={props.value}
           defaultValue={props.defaultValue}
           className={cn(
@@ -66,6 +73,9 @@ const InputGroup: React.FC<InputGroupProps> = ({
               : "px-5.5 py-3 text-dark placeholder:text-dark-6 dark:text-white",
             props.iconPosition === "left" && "pl-12.5",
             props.height === "sm" && "py-2.5",
+            // Visual indicators for valid/invalid fields (Requirement 9.4)
+            isValid && "border-green-500 dark:border-green-500",
+            isInvalid && "border-red-500 dark:border-red-500",
           )}
           required={required}
           disabled={disabled}
@@ -73,6 +83,42 @@ const InputGroup: React.FC<InputGroupProps> = ({
         />
 
         {icon}
+
+        {/* Visual indicator icon for valid fields (Requirement 9.4) */}
+        {isValid && (
+          <svg
+            className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-green-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+        )}
+
+        {/* Visual indicator icon for invalid fields (Requirement 9.4) */}
+        {isInvalid && (
+          <svg
+            className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-red-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        )}
       </div>
     </div>
   );

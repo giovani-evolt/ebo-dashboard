@@ -16,12 +16,13 @@ import { LogOutIcon, SettingsIcon, UserIcon } from "./icons";
 
 export function UserInfo() {
   const [isOpen, setIsOpen] = useState(false);
-  const { user, logout } = useAuth();
+  const { user, seller, logout } = useAuth();
   const router = useRouter();
 
   const USER = {
     name: user?.name || "User",
     email: user?.email || "",
+    sellerName: seller?.name || null,
     img: "/images/user/user-03.png",
   };
 
@@ -75,7 +76,9 @@ export function UserInfo() {
               {USER.email}
             </div>
 
-            <div className="leading-none text-gray-6">{USER.email}</div>
+            <div className="leading-none text-gray-6">
+              {USER.sellerName ? `Seller: ${USER.sellerName}` : USER.email}
+            </div>
           </figcaption>
         </figure>
 

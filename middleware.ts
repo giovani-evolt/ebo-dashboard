@@ -25,6 +25,7 @@ const protectedRoutePatterns = [
   '/tables',
   '/ui-elements',
   '/settlements',
+  '/units-sold',
 ];
 
 /**

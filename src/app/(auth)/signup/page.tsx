@@ -1,0 +1,76 @@
+import SignUpForm from "@/components/Auth/SignUp";
+import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
+import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Sign up",
+};
+
+export default function SignUpPage() {
+  return (
+    <>
+      <Breadcrumb pageName="Sign Up" />
+
+      <div className="rounded-[10px] bg-white shadow-1 dark:bg-gray-dark dark:shadow-card">
+        <div className="flex flex-wrap items-center">
+          <div className="w-full xl:w-1/2">
+            <div className="w-full p-4 sm:p-12.5 xl:p-15">
+              <span className="mb-1.5 block font-medium">Start for free</span>
+              <h2 className="mb-9 text-2xl font-bold text-dark dark:text-white sm:text-title-xl2">
+                Create Your Account
+              </h2>
+
+              <SignUpForm />
+
+              <div className="mt-6 text-center">
+                <p>
+                  ¿Ya tienes una cuenta?{" "}
+                  <Link href="/login" className="text-primary hover:underline">
+                    Inicia sesión
+                  </Link>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="hidden w-full p-7.5 xl:block xl:w-1/2">
+            <div className="custom-gradient-1 overflow-hidden rounded-2xl px-12.5 pt-12.5 dark:!bg-dark-2 dark:bg-none">
+              <Link className="mb-10 inline-block" href="/">
+                <Image
+                  src={"/images/logo/evolt-logo.webp"}
+                  alt="Evolt Logo"
+                  width={176}
+                  height={32}
+                />
+              </Link>
+              <p className="mb-3 text-xl font-medium text-dark dark:text-white">
+                Join our platform
+              </p>
+
+              <h1 className="mb-4 text-2xl font-bold text-dark dark:text-white sm:text-heading-3">
+                Get Started Today!
+              </h1>
+
+              <p className="w-full max-w-[375px] font-medium text-dark-4 dark:text-dark-6">
+                Create your account and start managing your business with our
+                powerful dashboard tools
+              </p>
+
+              <div className="mt-31">
+                <Image
+                  src={"/images/grids/grid-02.svg"}
+                  alt="Logo"
+                  width={405}
+                  height={325}
+                  className="mx-auto dark:opacity-30"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}

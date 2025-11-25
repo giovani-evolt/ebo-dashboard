@@ -1,7 +1,7 @@
 // Tipos compartidos para los datos de gráficos
 
 export type ChartDataPoint = {
-  x: string | number;
+  x: string;
   y: number;
 };
 

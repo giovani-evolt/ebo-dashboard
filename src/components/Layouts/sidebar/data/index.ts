@@ -2,7 +2,7 @@ import * as Icons from "../icons";
 
 export const NAV_DATA = [
   {
-    label: "",
+    label: "Menu",
     items: [
       {
         title: "Financial Information",
@@ -12,22 +12,44 @@ export const NAV_DATA = [
       },
       {
         title: "Settlements",
-        url: "/settlements",
         icon: Icons.Calendar,
+        url: "/settlements",
         items: [],
       },
       {
         title: "Units Sold",
-        url: "/units",
         icon: Icons.FourCircle,
+        url: "/units-sold",
+        items: []
+      },
+    ],
+  },
+  {
+    label: "Files",
+    items: [
+      {
+        title: "Csv",
+        url: "/csvs",
+        icon: Icons.Alphabet,
+        items: [],
+      },
+    ],
+  },
+  {
+    label: "Settings",
+    items: [
+      {
+        title: "User",
+        url: "/settings",
+        icon: Icons.User,
         items: [],
       },
       {
-        title: "Products",
-        url: "/products",
-        icon: Icons.FourCircle,
+        title: "Seller",
+        url: "/seller",
+        icon: Icons.User,
         items: [],
-      },
+      }
     ],
   },
 ];
