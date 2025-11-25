@@ -103,6 +103,7 @@ export function DataGrid<T extends Record<string, any>>({
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [endpoint]);
 
   const renderContent = () => {

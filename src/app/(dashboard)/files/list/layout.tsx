@@ -15,11 +15,11 @@ import { Providers } from "../../providers";
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | NextAdmin - Next.js Dashboard Kit",
-    default: "Settlements | NextAdmin - Next.js Dashboard Kit",
+    template: "%s | EvoltPlus",
+    default: "Files | EvoltPlus",
   },
   description:
-    "Manage and import your settlements",
+    "Manage and import your files",
 };
 
 export default function SettlementsLayout({ children }: PropsWithChildren) {

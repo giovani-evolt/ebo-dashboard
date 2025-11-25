@@ -15,8 +15,8 @@ import { Providers } from "../../providers";
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | NextAdmin - Next.js Dashboard Kit",
-    default: "Settlements | NextAdmin - Next.js Dashboard Kit",
+    template: "%s | EvoltPlus",
+    default: "Settlements | EvoltPlus",
   },
   description:
     "Manage and import your settlements",
