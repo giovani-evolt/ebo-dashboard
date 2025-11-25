@@ -98,7 +98,9 @@ const seller: Seller = {
 const user: User = {
   id: '456',
   email: 'test@example.com',
-  name: 'John Doe',
+  name: 'John',
+  lastName: 'Doe',
+  seller: 'seller/id'
 };
 
 const authResponse: AuthResponse = {

@@ -28,6 +28,8 @@ export function Sidebar() {
     // Keep collapsible open, when it's subpage is active
     NAV_DATA.some((section) => {
       return section.items.some((item) => {
+        if (item.items.length === 0) return false;
+        
         return item.items.some((subItem) => {
           if (subItem.url === pathname) {
             if (!expandedItems.includes(item.title)) {
@@ -40,7 +42,8 @@ export function Sidebar() {
         });
       });
     });
-  }, [pathname, expandedItems]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   return (
     <>

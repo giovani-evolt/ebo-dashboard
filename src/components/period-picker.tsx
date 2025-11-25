@@ -27,6 +27,8 @@ export function PeriodPicker<TItem extends string>({
 
   const [isOpen, setIsOpen] = useState(false);
 
+  const selectedTimeFrame = searchParams?.get(PARAM_KEY) ?? null;
+
   return (
     <Dropdown isOpen={isOpen} setIsOpen={setIsOpen}>
       <DropdownTrigger
@@ -54,7 +56,7 @@ export function PeriodPicker<TItem extends string>({
                   const queryString = createQueryString({
                     sectionKey,
                     value: item,
-                    selectedTimeFrame: searchParams.get(PARAM_KEY),
+                    selectedTimeFrame,
                   });
 
                   router.push(pathname + queryString, {
