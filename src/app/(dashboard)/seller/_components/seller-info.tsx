@@ -45,7 +45,7 @@ export function SellerInfoForm() {
     };
 
     fetchSellerData();
-  }, [user?.Seller]);
+  }, [user?.seller]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("es-ES", {
