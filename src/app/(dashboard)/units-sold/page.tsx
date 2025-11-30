@@ -86,7 +86,7 @@ export default function UnitsSoldListPage() {
       <Breadcrumb pageName="Units Sold" />
 
       <DataGrid<UnitSold>
-        endpoint="/api/units_solds"
+        endpoint="/units_solds"
         title="Units Sold"
         columns={unitsSoldColumns}
       />

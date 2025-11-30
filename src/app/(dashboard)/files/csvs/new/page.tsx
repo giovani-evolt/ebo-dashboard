@@ -43,7 +43,7 @@ export default function NewSettlementPage() {
       // formData.append("seller", "/api/sellers/123");
       formData.append("type", "1000");
 
-      await apiClient.post("/api/csvs", formData, {
+      await apiClient.post("/csvs", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

@@ -108,7 +108,7 @@ export default function SettlementsListPage() {
         <Breadcrumb pageName="Settlements" />
 
         <DataGrid<Settlement>
-          endpoint="/api/settlements"
+          endpoint="/settlements"
           title="Settlements"
           columns={settlementColumns}
         />

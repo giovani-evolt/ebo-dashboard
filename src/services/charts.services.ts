@@ -52,7 +52,7 @@ export async function getDevicesUsedData(
 }
 
 export async function getFinancialInformationData(): Promise<FinancialData> {
-  const json = await apiClient.get<any>('/api/transaction_totals');
+  const json = await apiClient.get<any>('/transaction_totals');
 
   const graph: FinancialData = {
     gross: [],

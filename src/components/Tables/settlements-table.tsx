@@ -57,7 +57,7 @@ export function SettlementsTable() {
   const fetchSettlements = async () => {
     try {
       setIsLoading(true);
-      const response = await apiClient.get<SettlementsResponse>("/api/csvs");
+      const response = await apiClient.get<SettlementsResponse>("/csvs");
       setSettlements(response.member || []);
       setError(null);
     } catch (err) {
