@@ -16,7 +16,7 @@ const publicRoutes = [
 
 // Define protected route patterns
 const protectedRoutePatterns = [
-  '/dashboard',
+  '/',
   '/profile',
   '/pages',
   '/calendar',

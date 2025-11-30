@@ -207,29 +207,11 @@ export function AuthProvider({ children }: PropsWithChildren) {
       // Step 2: Auto-login with the credentials
       // Requirement 4.1: Automatically authenticate after user creation
       setRegistrationStep('logging-in');
-      try {
-        await authService.login({
-          username: data.email,
-          password: data.password,
-        });
-        
-        // Requirement 4.2: Store token (handled by authService.login)
-        // Requirement 4.3: Set authentication state
-        const currentUser = await authService.getCurrentUser();
-        
-        if (currentUser) {
-          setUser(currentUser);
-        }
-      } catch (loginError: any) {
-        // Requirement 4.4: If auto-login fails, redirect to login page
-        console.error('Auto-login failed:', loginError);
-        setRegistrationStep('idle');
-        setIsLoading(false);
-        
-        // Redirect to login with message that account was created
-        router.push('/login?message=account-created');
-        return;
-      }
+      
+      await authService.login({
+        username: data.email,
+        password: data.password,
+      });
       
       // Step 3: Create seller for the authenticated user
       // Requirement 5.1: Send POST request to create seller with JWT token
@@ -257,13 +239,21 @@ export function AuthProvider({ children }: PropsWithChildren) {
           step: 'seller',
         };
       }
+
+      // Requirement 4.2: Store token (handled by authService.login)
+      // Requirement 4.3: Set authentication state
+      const currentUser = await authService.getCurrentUser();
+      
+      if (currentUser) {
+        setUser(currentUser);
+      }
       
       // Step 4: Redirect to dashboard
       // Requirement 6.1: Navigate to /dashboard route
       // Requirement 6.2: Complete redirect within 1 second
       // Requirement 6.3: User state and seller state are properly set before redirect
       setIsLoading(false);
-      router.push('/dashboard');
+      router.push('/');
       
     } catch (error: any) {
       // Handle errors from user creation step
