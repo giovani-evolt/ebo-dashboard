@@ -92,9 +92,9 @@ export interface Seller {
 }
 
 class AuthService {
-  private readonly AUTH_ENDPOINT = process.env.NEXT_PUBLIC_AUTH_LOGIN_ENDPOINT || '/auth';
+  private readonly AUTH_ENDPOINT = process.env.NEXT_PUBLIC_AUTH_LOGIN_ENDPOINT || '/login_check';
   private readonly REFRESH_ENDPOINT = process.env.NEXT_PUBLIC_AUTH_REFRESH_ENDPOINT || '/auth/refresh';
-  private readonly USER_ENDPOINT = process.env.NEXT_PUBLIC_AUTH_USER_ENDPOINT || '/auth/me';
+  private readonly USER_ENDPOINT = process.env.NEXT_PUBLIC_AUTH_USER_ENDPOINT || '/me';
   private readonly REGISTER_ENDPOINT = process.env.NEXT_PUBLIC_REGISTER_ENDPOINT || '/users';
   private readonly SELLER_ENDPOINT = process.env.NEXT_PUBLIC_SELLER_ENDPOINT || '/sellers';
 
