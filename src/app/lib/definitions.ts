@@ -174,8 +174,8 @@ export interface RegistrationFormErrors {
   lastName?: string
   /** Seller name validation error - Requirements 2.2, 2.3, 2.4 */
   sellerName?: string
-  /** Seller legal name validation error */
-  sellerLegalName?: string
+  /** Legal name validation error */
+  legalName?: string
   /** RFC validation error */
   rfc?: string
   /** General API or system error - Requirements 8.1, 8.2 */

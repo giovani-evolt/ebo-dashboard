@@ -409,7 +409,6 @@ export default function SignUpForm() {
         icon={<UserIcon />}
         isValid={validFields.legalName}
         isInvalid={touchedFields.legalName && !!errors.legalName}
-        maxLength={255}
         required
       />
       {touchedFields.legalName && errors.legalName && (
@@ -431,7 +430,6 @@ export default function SignUpForm() {
         icon={<UserIcon />}
         isValid={validFields.rfc}
         isInvalid={touchedFields.rfc && !!errors.rfc}
-        maxLength={13}
         required
       />
       {touchedFields.rfc && errors.rfc && (

@@ -49,6 +49,8 @@ const formData: RegistrationFormData = {
   firstName: 'John',
   lastName: 'Doe',
   sellerName: 'My Seller',
+  legalName: 'My Legal Name',
+  rfc: 'CAPG841018EXA'
 };
 
 const formErrors: RegistrationFormErrors = {
@@ -73,6 +75,8 @@ const registrationData: RegistrationData = {
   firstName: 'John',
   lastName: 'Doe',
   sellerName: 'My Seller',
+  legalName: 'Legal Name',
+  rfc: 'CAPG841018EXA'
 };
 
 const registrationStep: RegistrationStep = 'creating-user';
@@ -86,6 +90,8 @@ const registerUserData: RegisterUserData = {
 
 const createSellerData: CreateSellerData = {
   name: 'My Seller',
+  legalName: 'Legal Name',
+  rfc: 'CAPG841018EXA'
 };
 
 const seller: Seller = {
