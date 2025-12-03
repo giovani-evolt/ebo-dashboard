@@ -6,7 +6,7 @@ export function EmptyState() {
   const router = useRouter();
 
   const handleImportClick = () => {
-    router.push("/settlements/csvs/new");
+    router.push("/csvs/new");
   };
 
   return (

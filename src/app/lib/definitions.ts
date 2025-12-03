@@ -62,6 +62,17 @@ export const RegistrationFormSchema = z.object({
     .min(3, { message: 'El nombre del seller debe tener al menos 3 caracteres' })
     .max(100, { message: 'El nombre del seller no puede exceder 100 caracteres' })
     .trim(),
+  legalName: z
+    .string()
+    .min(1, { message: 'El nombre legal es requerido' })
+    .max(255, { message: 'El nombre legal no puede exceder 255 caracteres' })
+    .trim(),
+  rfc: z
+    .string()
+    .min(13, { message: 'El RFC debe tener exactamente 13 caracteres' })
+    .max(13, { message: 'El RFC debe tener exactamente 13 caracteres' })
+    .regex(/^[A-Z0-9]+$/, { message: 'El RFC solo puede contener letras mayúsculas y números' })
+    .trim(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: 'Las contraseñas no coinciden',
   path: ['confirmPassword'],
@@ -102,6 +113,25 @@ export const SellerNameFieldSchema = z
   .max(100, { message: 'El nombre del seller no puede exceder 100 caracteres' })
   .trim()
 
+export const LegalNameFieldSchema = z
+  .string()
+  .min(1, { message: 'El nombre legal es requerido' })
+  .max(255, { message: 'El nombre legal no puede exceder 255 caracteres' })
+  .trim()
+
+export const SellerLegalNameFieldSchema = z
+  .string()
+  .min(1, { message: 'El nombre legal del seller es requerido' })
+  .max(255, { message: 'El nombre legal no puede exceder 255 caracteres' })
+  .trim()
+
+export const RfcFieldSchema = z
+  .string()
+  .min(13, { message: 'El RFC debe tener exactamente 13 caracteres' })
+  .max(13, { message: 'El RFC debe tener exactamente 13 caracteres' })
+  .regex(/^[A-Z0-9]+$/, { message: 'El RFC solo puede contener letras mayúsculas y números' })
+  .trim()
+
 /**
  * Registration Form Data
  * Contains all fields required for user and seller registration
@@ -120,6 +150,10 @@ export interface RegistrationFormData {
   lastName: string
   /** Name of the seller to be created - Requirement 2.1 */
   sellerName: string
+  /** Legal name of the seller (max 255 characters) */
+  legalName: string
+  /** RFC (Registro Federal de Contribuyentes) - 13 alphanumeric characters */
+  rfc: string
 }
 
 /**
@@ -140,6 +174,10 @@ export interface RegistrationFormErrors {
   lastName?: string
   /** Seller name validation error - Requirements 2.2, 2.3, 2.4 */
   sellerName?: string
+  /** Seller legal name validation error */
+  sellerLegalName?: string
+  /** RFC validation error */
+  rfc?: string
   /** General API or system error - Requirements 8.1, 8.2 */
   general?: string
 }
@@ -196,6 +234,12 @@ export function validateRegistrationField(
         break
       case 'sellerName':
         SellerNameFieldSchema.parse(value)
+        break
+      case 'legalName':
+        LegalNameFieldSchema.parse(value)
+        break
+      case 'rfc':
+        RfcFieldSchema.parse(value.toUpperCase())
         break
       default:
         return null

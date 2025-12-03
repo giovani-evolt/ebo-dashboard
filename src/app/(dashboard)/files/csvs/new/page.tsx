@@ -76,7 +76,7 @@ export default function NewSettlementPage() {
   };
 
   const handleGoToSettlements = () => {
-    router.push("/settlements/csvs");
+    router.push("/csvs");
   };
 
   return (

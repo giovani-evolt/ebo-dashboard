@@ -20,7 +20,7 @@ export default function SettlementsPage() {
         </div>
         
         <Link
-          href="/settlements/csvs/new"
+          href="/csvs/new"
           className="inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 font-medium text-white transition hover:bg-opacity-90"
         >
           <svg

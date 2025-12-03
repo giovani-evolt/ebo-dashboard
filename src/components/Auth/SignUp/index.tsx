@@ -25,6 +25,8 @@ export default function SignUpForm() {
     firstName: "",
     lastName: "",
     sellerName: "",
+    legalName: "",
+    rfc: ""
   });
 
   const [errors, setErrors] = useState<RegistrationFormErrors>({});
@@ -163,6 +165,8 @@ export default function SignUpForm() {
         firstName: formData.firstName,
         lastName: formData.lastName,
         sellerName: formData.sellerName,
+        legalName: formData.legalName,
+        rfc: formData.rfc
       });
 
       // If successful, user will be redirected to dashboard by AuthContext
@@ -375,7 +379,7 @@ export default function SignUpForm() {
       <InputGroup
         type="text"
         label="Seller Name"
-        className="mb-5 [&_input]:py-[15px]"
+        className="mb-4 [&_input]:py-[15px]"
         placeholder="Enter your seller name"
         name="sellerName"
         handleChange={handleChange}
@@ -387,8 +391,52 @@ export default function SignUpForm() {
         required
       />
       {touchedFields.sellerName && errors.sellerName && (
-        <p className="-mt-4 mb-4 text-sm text-red-500 dark:text-red-400">
+        <p className="-mt-3 mb-3 text-sm text-red-500 dark:text-red-400">
           {errors.sellerName}
+        </p>
+      )}
+
+      {/* Legal Name Field */}
+      <InputGroup
+        type="text"
+        label="Legal Name"
+        className="mb-4 [&_input]:py-[15px]"
+        placeholder="Enter legal name (max 255 characters)"
+        name="legalName"
+        handleChange={handleChange}
+        handleBlur={() => handleFieldBlur("legalName")}
+        value={formData.legalName}
+        icon={<UserIcon />}
+        isValid={validFields.legalName}
+        isInvalid={touchedFields.legalName && !!errors.legalName}
+        maxLength={255}
+        required
+      />
+      {touchedFields.legalName && errors.legalName && (
+        <p className="-mt-3 mb-3 text-sm text-red-500 dark:text-red-400">
+          {errors.legalName}
+        </p>
+      )}
+
+      {/* RFC Field */}
+      <InputGroup
+        type="text"
+        label="RFC"
+        className="mb-5 [&_input]:py-[15px]"
+        placeholder="Enter RFC (13 alphanumeric characters)"
+        name="rfc"
+        handleChange={handleChange}
+        handleBlur={() => handleFieldBlur("rfc")}
+        value={formData.rfc}
+        icon={<UserIcon />}
+        isValid={validFields.rfc}
+        isInvalid={touchedFields.rfc && !!errors.rfc}
+        maxLength={13}
+        required
+      />
+      {touchedFields.rfc && errors.rfc && (
+        <p className="-mt-4 mb-4 text-sm text-red-500 dark:text-red-400">
+          {errors.rfc}
         </p>
       )}
 

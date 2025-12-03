@@ -73,6 +73,10 @@ export interface RegisterUserData {
 export interface CreateSellerData {
   /** Name of the seller - Requirement 5.3 */
   name: string;
+  /** Legal name of the seller (max 255 characters) */
+  legalName: string;
+  /** RFC (Registro Federal de Contribuyentes) - 13 alphanumeric characters */
+  rfc: string;
 }
 
 /**
@@ -316,6 +320,8 @@ class AuthService {
         this.SELLER_ENDPOINT,
         {
           name: sellerData.name,
+          legalName: sellerData.legalName,
+          rfc: sellerData.rfc,
         }
       );
       

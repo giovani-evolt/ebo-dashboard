@@ -28,6 +28,10 @@ export interface RegistrationData {
   lastName: string;
   /** Name of the seller to be created - Requirement 5.3 */
   sellerName: string;
+  /** Legal name of the seller (max 255 characters) */
+  legalName: string;
+  /** RFC (Registro Federal de Contribuyentes) - 13 alphanumeric characters */
+  rfc: string;
 }
 
 /**
@@ -219,6 +223,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
       try {
         const createdSeller = await authService.createSeller({
           name: data.sellerName,
+          legalName: data.legalName,
+          rfc: data.rfc,
         });
         
         // Requirement 5.4: Seller created successfully
