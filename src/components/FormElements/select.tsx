@@ -9,8 +9,11 @@ type PropsType = {
   items: { value: string; label: string }[];
   prefixIcon?: React.ReactNode;
   className?: string;
+  value?: string;
+  onChange?: (value: string) => void;
+  disabled?: boolean;
 } & (
-  | { placeholder?: string; defaultValue: string }
+  | { placeholder?: string; defaultValue?: string }
   | { placeholder: string; defaultValue?: string }
 );
 
@@ -18,22 +21,42 @@ export function Select({
   items,
   label,
   defaultValue,
+  value,
+  onChange,
   placeholder,
   prefixIcon,
   className,
+  disabled = false,
 }: PropsType) {
   const id = useId();
+  const isControlled = value !== undefined;
 
   const [isOptionSelected, setIsOptionSelected] = useState(false);
+  const [internalValue, setInternalValue] = useState(defaultValue || "");
+
+  const currentValue = isControlled ? value : internalValue;
+
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newValue = e.target.value;
+    setIsOptionSelected(true);
+    
+    if (!isControlled) {
+      setInternalValue(newValue);
+    }
+    
+    onChange?.(newValue);
+  };
 
   return (
     <div className={cn("space-y-3", className)}>
-      <label
-        htmlFor={id}
-        className="block text-body-sm font-medium text-dark dark:text-white"
-      >
-        {label}
-      </label>
+      {label && (
+        <label
+          htmlFor={id}
+          className="block text-body-sm font-medium text-dark dark:text-white"
+        >
+          {label}
+        </label>
+      )}
 
       <div className="relative">
         {prefixIcon && (
@@ -44,12 +67,14 @@ export function Select({
 
         <select
           id={id}
-          defaultValue={defaultValue || ""}
-          onChange={() => setIsOptionSelected(true)}
+          value={currentValue}
+          onChange={handleChange}
+          disabled={disabled}
           className={cn(
             "w-full appearance-none rounded-lg border border-stroke bg-transparent px-5.5 py-3 outline-none transition focus:border-primary active:border-primary dark:border-dark-3 dark:bg-dark-2 dark:focus:border-primary [&>option]:text-dark-5 dark:[&>option]:text-dark-6",
-            isOptionSelected && "text-dark dark:text-white",
+            (isOptionSelected || currentValue) && "text-dark dark:text-white",
             prefixIcon && "pl-11.5",
+            disabled && "cursor-not-allowed opacity-50",
           )}
         >
           {placeholder && (

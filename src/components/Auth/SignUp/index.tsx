@@ -24,9 +24,6 @@ export default function SignUpForm() {
     confirmPassword: "",
     firstName: "",
     lastName: "",
-    sellerName: "",
-    legalName: "",
-    rfc: ""
   });
 
   const [errors, setErrors] = useState<RegistrationFormErrors>({});
@@ -164,9 +161,6 @@ export default function SignUpForm() {
         password: formData.password,
         firstName: formData.firstName,
         lastName: formData.lastName,
-        sellerName: formData.sellerName,
-        legalName: formData.legalName,
-        rfc: formData.rfc
       });
 
       // If successful, user will be redirected to dashboard by AuthContext
@@ -202,20 +196,6 @@ export default function SignUpForm() {
         } else if (error.message) {
           errorMessage = error.message;
         }
-      } else if (error.step === 'seller') {
-        // Requirement 5.5: Errors from seller creation step
-        // User is already authenticated, so they can retry or continue
-        if (error.statusCode === 401) {
-          errorMessage = error.message || 'Sesión inválida. Por favor inicia sesión nuevamente';
-        } else if (error.statusCode === 400) {
-          errorMessage = error.message || 'Error al crear seller. Por favor verifica el nombre del seller';
-        } else if (error.statusCode >= 500) {
-          errorMessage = error.message || 'Error al crear seller. Por favor intenta nuevamente más tarde';
-        } else if (error.statusCode === 0) {
-          errorMessage = error.message || 'Error de conexión. Por favor verifica tu conexión a internet';
-        } else if (error.message) {
-          errorMessage = error.message;
-        }
       } else if (error.message) {
         // Generic error with message
         errorMessage = error.message;
@@ -237,12 +217,8 @@ export default function SignUpForm() {
     switch (registrationStep) {
       case 'creating-user':
         return 'Creando tu cuenta...';
-      case 'logging-in':
-        return 'Iniciando sesión...';
-      case 'creating-seller':
-        return 'Creando tu seller...';
       case 'complete':
-        return 'Redirigiendo al dashboard...';
+        return 'Redirigiendo...';
       default:
         return null;
     }
@@ -372,69 +348,6 @@ export default function SignUpForm() {
       {touchedFields.lastName && errors.lastName && (
         <p className="-mt-3 mb-3 text-sm text-red-500 dark:text-red-400">
           {errors.lastName}
-        </p>
-      )}
-
-      {/* Seller Name Field */}
-      <InputGroup
-        type="text"
-        label="Seller Name"
-        className="mb-4 [&_input]:py-[15px]"
-        placeholder="Enter your seller name"
-        name="sellerName"
-        handleChange={handleChange}
-        handleBlur={() => handleFieldBlur("sellerName")}
-        value={formData.sellerName}
-        icon={<UserIcon />}
-        isValid={validFields.sellerName}
-        isInvalid={touchedFields.sellerName && !!errors.sellerName}
-        required
-      />
-      {touchedFields.sellerName && errors.sellerName && (
-        <p className="-mt-3 mb-3 text-sm text-red-500 dark:text-red-400">
-          {errors.sellerName}
-        </p>
-      )}
-
-      {/* Legal Name Field */}
-      <InputGroup
-        type="text"
-        label="Legal Name"
-        className="mb-4 [&_input]:py-[15px]"
-        placeholder="Enter legal name (max 255 characters)"
-        name="legalName"
-        handleChange={handleChange}
-        handleBlur={() => handleFieldBlur("legalName")}
-        value={formData.legalName}
-        icon={<UserIcon />}
-        isValid={validFields.legalName}
-        isInvalid={touchedFields.legalName && !!errors.legalName}
-        required
-      />
-      {touchedFields.legalName && errors.legalName && (
-        <p className="-mt-3 mb-3 text-sm text-red-500 dark:text-red-400">
-          {errors.legalName}
-        </p>
-      )}
-
-      {/* RFC Field */}
-      <InputGroup
-        type="text"
-        label="RFC"
-        className="mb-5 [&_input]:py-[15px]"
-        placeholder="Enter RFC (13 alphanumeric characters)"
-        name="rfc"
-        handleChange={handleChange}
-        handleBlur={() => handleFieldBlur("rfc")}
-        value={formData.rfc}
-        icon={<UserIcon />}
-        isValid={validFields.rfc}
-        isInvalid={touchedFields.rfc && !!errors.rfc}
-        required
-      />
-      {touchedFields.rfc && errors.rfc && (
-        <p className="-mt-4 mb-4 text-sm text-red-500 dark:text-red-400">
-          {errors.rfc}
         </p>
       )}
 

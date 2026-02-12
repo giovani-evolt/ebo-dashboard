@@ -51,8 +51,85 @@ export async function getDevicesUsedData(
   return data;
 }
 
-export async function getFinancialInformationData(): Promise<FinancialData> {
-  const json = await apiClient.get<any>('/transaction_totals');
+interface TransactionTotalItem {
+  year: number;
+  month: number;
+  PNLAccount: string;
+  PNLSubAccount: string;
+  totalAmount: string;
+}
+
+interface WaterfallDataPoint {
+  name: string;
+  value: number;
+  itemStyle?: {
+    color: string;
+  };
+}
+
+export interface WaterfallChartData {
+  categories: string[];
+  data: WaterfallDataPoint[];
+}
+
+// Cache for transaction totals data
+let transactionTotalsCache: TransactionTotalItem[] | null = null;
+let transactionTotalsCachePromise: Promise<TransactionTotalItem[]> | null = null;
+
+/**
+ * Fetches transaction totals data with caching to avoid duplicate API calls
+ */
+async function getTransactionTotalsData(): Promise<TransactionTotalItem[]> {
+  // If we already have cached data, return it
+  if (transactionTotalsCache !== null) {
+    return transactionTotalsCache;
+  }
+
+  // If there's already a request in progress, wait for it
+  if (transactionTotalsCachePromise !== null) {
+    return transactionTotalsCachePromise;
+  }
+
+  // Make the API call and cache the result
+  transactionTotalsCachePromise = (async () => {
+    try {
+      const json = await apiClient.get<any>('/transaction-totals/total-type/');
+      const data = json.member || [];
+      transactionTotalsCache = data;
+      return data;
+    } finally {
+      transactionTotalsCachePromise = null;
+    }
+  })();
+
+  return transactionTotalsCachePromise;
+}
+
+/**
+ * Clears the transaction totals cache (useful for testing or forced refresh)
+ */
+export function clearTransactionTotalsCache() {
+  transactionTotalsCache = null;
+  transactionTotalsCachePromise = null;
+}
+
+export async function getFinancialInformationData(year?: number, month?: number): Promise<FinancialData> {
+  const allData = await getTransactionTotalsData();
+
+  // Filter by year/month if provided
+  let filteredData: TransactionTotalItem[] = allData;
+  
+  if (year && month) {
+    // Filter by both year and month
+    filteredData = allData.filter(
+      (item: TransactionTotalItem) => item.year === year && item.month === month
+    );
+  } else if (year) {
+    // Filter by year only - aggregate all months of that year
+    filteredData = allData.filter(
+      (item: TransactionTotalItem) => item.year === year
+    );
+  }
 
   const graph: FinancialData = {
     gross: [],
@@ -61,89 +138,292 @@ export async function getFinancialInformationData(): Promise<FinancialData> {
     disc: []
   };
 
-  console.log(json);
-
-  json.member.forEach((element: any) => {
-    const dp: ChartDataPoint = {
-      x: standardMonth(element.month),
-      y: parseFloat(element.totalAmount)
-    };
-    switch(element.totalType){
-      case 'GRSS':
-        graph.gross.push(dp);
-        break;
-      case 'TXS':
-        graph.taxes.push(dp);
-        break;
-      case 'FRSH':
-        graph.frsh.push(dp);
-        break;
-      case 'DSCN':
-        graph.disc.push(dp);
-        break;
+  // Group data by year-month for waterfall calculation
+  const groupedData: Record<string, TransactionTotalItem[]> = {};
+  
+  filteredData.forEach((element: TransactionTotalItem) => {
+    const key = `${element.year}-${element.month}`;
+    if (!groupedData[key]) {
+      groupedData[key] = [];
     }
+    groupedData[key].push(element);
+  });
+
+  // Process each month
+  Object.keys(groupedData).forEach((key) => {
+    const [year, month] = key.split('-').map(Number);
+    const monthData = groupedData[key];
+    
+    // Calculate totals for each category
+    let grossPrincipal = 0;
+    let shipping = 0;
+    let tax = 0;
+    let discounts = 0;
+    let refunds = 0;
+    let amazonFees = 0;
+    let orderFees = 0;
+    let otherFees = 0;
+    let freightShipping = 0;
+
+    monthData.forEach((item) => {
+      const amount = parseFloat(item.totalAmount);
+      
+      if (item.PNLAccount === 'Gross') {
+        if (item.PNLSubAccount === 'Gross Principal') grossPrincipal += amount;
+        else if (item.PNLSubAccount === 'Shipping') shipping += amount;
+        else if (item.PNLSubAccount === 'Tax') tax += amount;
+      } else if (item.PNLAccount === 'Discounts') {
+        discounts += Math.abs(amount); // Already negative, make positive for calculation
+      } else if (item.PNLAccount === 'Refund') {
+        refunds += Math.abs(amount); // Already negative
+      } else if (item.PNLAccount === 'Comms & Fees') {
+        if (item.PNLSubAccount === 'Amazon Fees') amazonFees += Math.abs(amount);
+        else if (item.PNLSubAccount === 'Order Fees') orderFees += Math.abs(amount);
+        else if (item.PNLSubAccount === 'Others') otherFees += Math.abs(amount);
+      } else if (item.PNLAccount === 'Freight & Shipping') {
+        freightShipping += Math.abs(amount); // Already negative
+      }
+    });
+
+    const monthLabel = standardMonth(month);
+    const grossTotal = grossPrincipal + shipping + tax;
+    const commsFees = amazonFees + orderFees + otherFees;
+
+    graph.gross.push({ x: monthLabel, y: grossTotal });
+    graph.taxes.push({ x: monthLabel, y: tax });
+    graph.frsh.push({ x: monthLabel, y: freightShipping });
+    graph.disc.push({ x: monthLabel, y: discounts });
   });
   
   return graph as FinancialData;
-    /*return {
-      gross: [
-        { x: "Jan", y: 0 },
-        { x: "Feb", y: 20 },
-        { x: "Mar", y: 35 },
-        { x: "Apr", y: 45 },
-        { x: "May", y: 35 },
-        { x: "Jun", y: 55 },
-        { x: "Jul", y: 65 },
-        { x: "Aug", y: 50 },
-        { x: "Sep", y: 65 },
-        { x: "Oct", y: 75 },
-        { x: "Nov", y: 60 },
-        { x: "Dec", y: 75 },
-      ],
-      taxes: [
-        { x: "Jan", y: 15 },
-        { x: "Feb", y: 9 },
-        { x: "Mar", y: 17 },
-        { x: "Apr", y: 32 },
-        { x: "May", y: 25 },
-        { x: "Jun", y: 68 },
-        { x: "Jul", y: 80 },
-        { x: "Aug", y: 68 },
-        { x: "Sep", y: 84 },
-        { x: "Oct", y: 94 },
-        { x: "Nov", y: 74 },
-        { x: "Dec", y: 62 },
-      ],
-      frsh: [
-        { x: "Jan", y: 5 },
-        { x: "Feb", y: 69 },
-        { x: "Mar", y: 47 },
-        { x: "Apr", y: 22 },
-        { x: "May", y: 85 },
-        { x: "Jun", y: 78 },
-        { x: "Jul", y: 18 },
-        { x: "Aug", y: 66 },
-        { x: "Sep", y: 88 },
-        { x: "Oct", y: 79 },
-        { x: "Nov", y: 57 },
-        { x: "Dec", y: 32 },
-      ],
-      disc: [
-        { x: "Jan", y: 10 },
-        { x: "Feb", y: 20 },
-        { x: "Mar", y: 30 },
-        { x: "Apr", y: 62 },
-        { x: "May", y: 23 },
-        { x: "Jun", y: 28 },
-        { x: "Jul", y: 10 },
-        { x: "Aug", y: 48 },
-        { x: "Sep", y: 24 },
-        { x: "Oct", y: 14 },
-        { x: "Nov", y: 24 },
-        { x: "Dec", y: 12 },
-      ],
-    };
-  }*/
+}
+
+export interface YearMonthOption {
+  year: number;
+  months: number[];
+}
+
+export async function getAvailableYearsAndMonths(): Promise<YearMonthOption[]> {
+  const allData = await getTransactionTotalsData();
+  
+  // Extract unique year-month combinations
+  const yearMonthMap = new Map<number, Set<number>>();
+  
+  allData.forEach((item: TransactionTotalItem) => {
+    if (!yearMonthMap.has(item.year)) {
+      yearMonthMap.set(item.year, new Set());
+    }
+    yearMonthMap.get(item.year)!.add(item.month);
+  });
+  
+  // Convert to array and sort
+  const result: YearMonthOption[] = Array.from(yearMonthMap.entries())
+    .map(([year, months]) => ({
+      year,
+      months: Array.from(months).sort((a, b) => a - b)
+    }))
+    .sort((a, b) => b.year - a.year); // Sort years descending
+  
+  return result;
+}
+
+export async function getWaterfallChartData(year?: number, month?: number): Promise<WaterfallChartData> {
+  const allData = await getTransactionTotalsData();
+  
+  // Filter by year/month if provided, otherwise use the most recent month
+  let filteredData: TransactionTotalItem[] = allData;
+  
+  if (year && month) {
+    // Filter by both year and month
+    filteredData = allData.filter(
+      (item: TransactionTotalItem) => item.year === year && item.month === month
+    );
+  } else if (year) {
+    // Filter by year only - aggregate all months of that year
+    filteredData = allData.filter(
+      (item: TransactionTotalItem) => item.year === year
+    );
+  } else if (allData.length > 0) {
+    // Get the most recent month if no filters provided
+    const sorted = [...allData].sort((a, b) => {
+      if (a.year !== b.year) return b.year - a.year;
+      return b.month - a.month;
+    });
+    const latest = sorted[0];
+    filteredData = allData.filter(
+      (item: TransactionTotalItem) => item.year === latest.year && item.month === latest.month
+    );
+  }
+
+  // Calculate totals
+  let grossPrincipal = 0;
+  let shipping = 0;
+  let tax = 0;
+  let discounts = 0;
+  let refunds = 0;
+  let amazonFees = 0;
+  let orderFees = 0;
+  let otherFees = 0;
+  let freightShipping = 0;
+
+  filteredData.forEach((item: TransactionTotalItem) => {
+    const amount = parseFloat(item.totalAmount);
+    
+    if (item.PNLAccount === 'Gross') {
+      if (item.PNLSubAccount === 'Gross Principal') grossPrincipal += amount;
+      else if (item.PNLSubAccount === 'Shipping') shipping += amount;
+      else if (item.PNLSubAccount === 'Tax') tax += amount;
+    } else if (item.PNLAccount === 'Discounts') {
+      discounts += Math.abs(amount);
+    } else if (item.PNLAccount === 'Refund') {
+      refunds += Math.abs(amount);
+    } else if (item.PNLAccount === 'Comms & Fees') {
+      if (item.PNLSubAccount === 'Amazon Fees') amazonFees += Math.abs(amount);
+      else if (item.PNLSubAccount === 'Order Fees') orderFees += Math.abs(amount);
+      else if (item.PNLSubAccount === 'Others') otherFees += Math.abs(amount);
+    } else if (item.PNLAccount === 'Freight & Shipping') {
+      freightShipping += Math.abs(amount);
+    }
+  });
+
+  // Calculate waterfall values
+  // Gross Sales includes Principal + Shipping + Tax
+  const grossSales = grossPrincipal + shipping + tax;
+  const netSales = grossSales - discounts - refunds;
+  // Net Sales after Taxes = Net Sales - Tax (tax is deducted separately)
+  const netSalesAfterTaxes = netSales - tax;
+  const grossMargin = netSalesAfterTaxes; // Assuming no cost of product
+  const commsFees = amazonFees + orderFees + otherFees;
+  const contributionMargin = grossMargin - commsFees - freightShipping;
+  const ebitda = contributionMargin; // Assuming no marketing expense or OPEX
+
+  // Build waterfall data
+  const categories: string[] = [];
+  const data: WaterfallDataPoint[] = [];
+  let runningTotal = 0;
+
+  // Gross Sales (initial bar - dark grey)
+  categories.push('Gross Sales');
+  data.push({
+    name: 'Gross Sales',
+    value: grossSales,
+    itemStyle: { color: '#6B7280' } // Dark grey
+  });
+  runningTotal = grossSales;
+
+  // Proms & Discounts (negative - orange)
+  categories.push('Proms & Discounts');
+  data.push({
+    name: 'Proms & Discounts',
+    value: -discounts,
+    itemStyle: { color: '#F97316' } // Orange
+  });
+  runningTotal -= discounts;
+
+  // Refunds (negative - orange)
+  categories.push('Refunds');
+  data.push({
+    name: 'Refunds',
+    value: -refunds,
+    itemStyle: { color: '#F97316' } // Orange
+  });
+  runningTotal -= refunds;
+
+  // Net Sales (intermediate - light green)
+  categories.push('Net Sales');
+  data.push({
+    name: 'Net Sales',
+    value: netSales,
+    itemStyle: { color: '#86EFAC' } // Light green
+  });
+
+  // Taxes (negative - orange)
+  categories.push('Taxes');
+  data.push({
+    name: 'Taxes',
+    value: -tax,
+    itemStyle: { color: '#F97316' } // Orange
+  });
+  runningTotal = netSalesAfterTaxes;
+
+  // Net Sales after Taxes (intermediate - light green)
+  categories.push('Net Sales after Taxes');
+  data.push({
+    name: 'Net Sales after Taxes',
+    value: netSalesAfterTaxes,
+    itemStyle: { color: '#86EFAC' } // Light green
+  });
+
+  // Cost of Product (0 or not applicable)
+  categories.push('Cost of Product');
+  data.push({
+    name: 'Cost of Product',
+    value: 0,
+    itemStyle: { color: '#86EFAC' } // Light green
+  });
+
+  // Gross Margin (intermediate - light green)
+  categories.push('Gross Margin');
+  data.push({
+    name: 'Gross Margin',
+    value: grossMargin,
+    itemStyle: { color: '#86EFAC' } // Light green
+  });
+
+  // Comms & Fees (negative - orange)
+  categories.push('Comms & Fees');
+  data.push({
+    name: 'Comms & Fees',
+    value: -commsFees,
+    itemStyle: { color: '#F97316' } // Orange
+  });
+  runningTotal -= commsFees;
+
+  // Freight & Shipping (negative - orange)
+  categories.push('Freight & Shipping');
+  data.push({
+    name: 'Freight & Shipping',
+    value: -freightShipping,
+    itemStyle: { color: '#F97316' } // Orange
+  });
+  runningTotal -= freightShipping;
+
+  // Contribution Margin (intermediate - light green)
+  categories.push('Contribution Margin');
+  data.push({
+    name: 'Contribution Margin',
+    value: contributionMargin,
+    itemStyle: { color: '#86EFAC' } // Light green
+  });
+
+  // Marketing Expense (0 or not applicable)
+  categories.push('Marketing Expense');
+  data.push({
+    name: 'Marketing Expense',
+    value: 0,
+    itemStyle: { color: '#86EFAC' } // Light green
+  });
+
+  // OPEX (0 or not applicable)
+  categories.push('OPEX');
+  data.push({
+    name: 'OPEX',
+    value: 0,
+    itemStyle: { color: '#86EFAC' } // Light green
+  });
+
+  // EBITDA (final - light green)
+  categories.push('EBITDA');
+  data.push({
+    name: 'EBITDA',
+    value: ebitda,
+    itemStyle: { color: '#86EFAC' } // Light green
+  });
+
+  return {
+    categories,
+    data
+  };
 }
 
 export async function getPaymentsOverviewData(

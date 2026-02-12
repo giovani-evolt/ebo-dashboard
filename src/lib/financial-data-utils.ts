@@ -137,3 +137,35 @@ export function extractLastMonthDataSafe(
     return fallbackData;
   }
 }
+
+/**
+ * Calculates the total financial data for the selected period
+ * @param data - The complete financial data containing all months
+ * @returns An object with the total values for the selected period
+ */
+export function calculatePeriodTotals(
+  data: FinancialData
+): LastMonthFinancialData {
+  if (!isValidFinancialData(data)) {
+    console.error("Failed to calculate period totals: invalid data structure", data);
+    return {
+      gross: 0,
+      taxes: 0,
+      frsh: 0,
+      disc: 0,
+    };
+  }
+
+  // Sum all values in each array
+  const gross = data.gross.reduce((acc, point) => acc + point.y, 0);
+  const taxes = data.taxes.reduce((acc, point) => acc + point.y, 0);
+  const frsh = data.frsh.reduce((acc, point) => acc + point.y, 0);
+  const disc = data.disc.reduce((acc, point) => acc + point.y, 0);
+
+  return {
+    gross,
+    taxes,
+    frsh,
+    disc,
+  };
+}

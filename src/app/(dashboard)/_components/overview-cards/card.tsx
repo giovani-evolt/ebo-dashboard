@@ -33,7 +33,7 @@ export function OverviewCard({ label, data, Icon }: PropsType) {
             isDecreasing ? "text-red" : "text-green",
           )}
         >
-          <dt className="flex items-center gap-1.5">
+          {/* <dt className="flex items-center gap-1.5">
             {data.growthRate}%
             {isDecreasing ? (
               <ArrowDownIcon aria-hidden />
@@ -45,7 +45,7 @@ export function OverviewCard({ label, data, Icon }: PropsType) {
           <dd className="sr-only">
             {label} {isDecreasing ? "Decreased" : "Increased"} by{" "}
             {data.growthRate}%
-          </dd>
+          </dd> */}
         </dl>
       </div>
     </div>

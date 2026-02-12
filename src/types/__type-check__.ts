@@ -48,9 +48,6 @@ const formData: RegistrationFormData = {
   confirmPassword: 'Password123',
   firstName: 'John',
   lastName: 'Doe',
-  sellerName: 'My Seller',
-  legalName: 'My Legal Name',
-  rfc: 'CAPG841018EXA'
 };
 
 const formErrors: RegistrationFormErrors = {
@@ -74,9 +71,6 @@ const registrationData: RegistrationData = {
   password: 'Password123',
   firstName: 'John',
   lastName: 'Doe',
-  sellerName: 'My Seller',
-  legalName: 'Legal Name',
-  rfc: 'CAPG841018EXA'
 };
 
 const registrationStep: RegistrationStep = 'creating-user';

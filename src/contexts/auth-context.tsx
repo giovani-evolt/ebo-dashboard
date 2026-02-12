@@ -13,9 +13,9 @@ import { useRouter } from 'next/navigation';
 
 /**
  * Registration Data
- * Combines user and seller data for the complete signup flow
+ * Contains user data for the signup flow
  * This is the data passed to the signup() method
- * Requirements: 3.2, 5.3
+ * Requirements: 3.2
  */
 export interface RegistrationData {
   /** User's email address - Requirement 3.2 */
@@ -26,26 +26,18 @@ export interface RegistrationData {
   firstName: string;
   /** User's last name - Requirement 3.2 */
   lastName: string;
-  /** Name of the seller to be created - Requirement 5.3 */
-  sellerName: string;
-  /** Legal name of the seller (max 255 characters) */
-  legalName: string;
-  /** RFC (Registro Federal de Contribuyentes) - 13 alphanumeric characters */
-  rfc: string;
 }
 
 /**
  * Registration Step
- * Tracks the current step in the multi-stage registration process
+ * Tracks the current step in the registration process
  * Used for displaying progress indicators to the user
  * Requirement 7.3
  */
 export type RegistrationStep = 
   | 'idle'              // No registration in progress
   | 'creating-user'     // Creating user account (Requirement 3.1)
-  | 'logging-in'        // Auto-login in progress (Requirement 4.1)
-  | 'creating-seller'   // Creating seller (Requirement 5.1)
-  | 'complete';         // Registration complete, ready to redirect (Requirement 6.1)
+  | 'complete';         // Registration complete, ready to redirect
 
 interface AuthContextValue {
   user: User | null;
@@ -185,13 +177,11 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
   /**
    * Signup method
-   * Orchestrates the full registration flow:
+   * Orchestrates the registration flow:
    * 1. Create user account
-   * 2. Auto-login with credentials
-   * 3. Create seller for the user
-   * 4. Redirect to dashboard
+   * 2. Redirect to email confirmation page
    * 
-   * Requirements: 3.1, 4.1, 4.2, 4.3, 4.4, 5.1, 5.4, 6.1, 6.2
+   * Requirements: 3.1
    */
   const signup = async (data: RegistrationData): Promise<void> => {
     setIsLoading(true);
@@ -208,58 +198,10 @@ export function AuthProvider({ children }: PropsWithChildren) {
         lastName: data.lastName,
       });
       
-      // Step 2: Auto-login with the credentials
-      // Requirement 4.1: Automatically authenticate after user creation
-      setRegistrationStep('logging-in');
-      
-      await authService.login({
-        username: data.email,
-        password: data.password,
-      });
-      
-      // Step 3: Create seller for the authenticated user
-      // Requirement 5.1: Send POST request to create seller with JWT token
-      setRegistrationStep('creating-seller');
-      try {
-        const createdSeller = await authService.createSeller({
-          name: data.sellerName,
-          legalName: data.legalName,
-          rfc: data.rfc,
-        });
-        
-        // Requirement 5.4: Seller created successfully
-        // Store seller information in context for display
-        setSeller(createdSeller);
-        setRegistrationStep('complete');
-      } catch (sellerError: any) {
-        // Requirement 5.5: If seller creation fails, keep user authenticated
-        console.error('Seller creation failed:', sellerError);
-        setRegistrationStep('idle');
-        setIsLoading(false);
-        
-        // Re-throw error so component can handle it
-        // User remains authenticated but seller creation failed
-        throw {
-          ...sellerError,
-          message: sellerError.message || 'Error al crear seller. Por favor intenta nuevamente más tarde',
-          step: 'seller',
-        };
-      }
-
-      // Requirement 4.2: Store token (handled by authService.login)
-      // Requirement 4.3: Set authentication state
-      const currentUser = await authService.getCurrentUser();
-      
-      if (currentUser) {
-        setUser(currentUser);
-      }
-      
-      // Step 4: Redirect to dashboard
-      // Requirement 6.1: Navigate to /dashboard route
-      // Requirement 6.2: Complete redirect within 1 second
-      // Requirement 6.3: User state and seller state are properly set before redirect
+      // Step 2: Redirect to email confirmation page
+      setRegistrationStep('complete');
       setIsLoading(false);
-      router.push('/');
+      router.push('/signup/confirm-email');
       
     } catch (error: any) {
       // Handle errors from user creation step

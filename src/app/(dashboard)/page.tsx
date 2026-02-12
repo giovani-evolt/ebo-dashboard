@@ -1,33 +1,43 @@
 "use client";
 
 import { FinancialInformation } from "@/components/Charts/financial-information-overview";
-import { createTimeFrameExtractor } from "@/utils/timeframe-extractor";
+import { FinancialTotals } from "@/components/Charts/financial-totals";
+import { DateFilterProvider, useDateFilter } from "@/contexts/date-filter-context";
+import { DateFilterSelector } from "@/components/date-filter-selector";
 import { OverviewCardsGroup, OverviewCardsSkeleton } from "./_components/overview-cards";
-import { getFinancialInformationData } from "@/services/charts.services";
-import { ErrorFallback } from "@/components/ui/error-fallback";
+import { getFinancialInformationData, getWaterfallChartData, type WaterfallChartData } from "@/services/charts.services";
 import { isValidFinancialData } from "@/lib/financial-data-utils";
 import { useEffect, useState } from "react";
 import { FinancialData } from "@/types/charts.types";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { EmptyState } from "./_components/empty-state";
 
-export default function Home() {
-  const searchParams = useSearchParams();
-  const selected_time_frame = searchParams?.get("selected_time_frame") || undefined;
-  const extractTimeFrame = createTimeFrameExtractor(selected_time_frame);
+function DashboardContent() {
+  const router = useRouter();
+  const { selectedYear, selectedMonth, isLoading: isLoadingFilters } = useDateFilter();
 
   const [financialData, setFinancialData] = useState<FinancialData | null>(null);
+  const [waterfallData, setWaterfallData] = useState<WaterfallChartData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Load data when filters change
   useEffect(() => {
+    if (isLoadingFilters || selectedYear === null) return;
+
+    const year = selectedYear; // Type narrowing
+    const month = selectedMonth !== null ? selectedMonth : undefined;
+
     async function fetchFinancialData() {
       setIsLoading(true);
       setError(null);
 
       try {
-        const data = await getFinancialInformationData();
+        const [data, waterfall] = await Promise.all([
+          getFinancialInformationData(year, month),
+          getWaterfallChartData(year, month)
+        ]);
 
         // Validate the data structure
         if (!data) {
@@ -63,6 +73,7 @@ export default function Home() {
 
         console.log('Successfully loaded and validated financial data');
         setFinancialData(data);
+        setWaterfallData(waterfall);
       } catch (err) {
         console.error('Failed to load financial data:', err);
         const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
@@ -74,18 +85,65 @@ export default function Home() {
     }
 
     fetchFinancialData();
-  }, []);
+  }, [selectedYear, selectedMonth, isLoadingFilters]);
 
   if (error) {
+    const handleImportClick = () => {
+      router.push("/csvs/new");
+    };
+
     return (
-      <ErrorFallback
-        title="Failed to load financial data"
-        message={error}
-      />
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="text-center">
+          <div className="mx-auto mb-6 flex size-20 items-center justify-center rounded-full bg-meta-1/10">
+            <svg
+              className="size-10 fill-meta-1"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"
+                fill="currentColor"
+              />
+            </svg>
+          </div>
+
+          <h3 className="mb-2 text-2xl font-semibold text-dark dark:text-white">
+            Failed to load financial data
+          </h3>
+          
+          <p className="mb-6 text-body text-gray-5 dark:text-gray-4">
+            {error}
+          </p>
+
+          <button
+            onClick={handleImportClick}
+            className="inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 font-medium text-white transition hover:bg-opacity-90"
+          >
+            <svg
+              className="size-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            Upload Files
+          </button>
+        </div>
+      </div>
     );
   }
 
-  if (isLoading || !financialData) {
+  if (isLoading || !financialData || !waterfallData) {
     return (
       <>
         <OverviewCardsSkeleton />
@@ -133,15 +191,21 @@ export default function Home() {
 
   return (
     <>
+      <DateFilterSelector />
+      
       <OverviewCardsGroup financialData={financialData} />
 
       <div className="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-9 2xl:gap-7.5">
         <FinancialInformation
-          data={financialData}
+          waterfallData={waterfallData}
           className="col-span-12 xl:col-span-12"
-          key={extractTimeFrame("payments_overview")}
-          timeFrame={extractTimeFrame("payments_overview")?.split(":")[1]}
         />
+
+        {/* <div className="col-span-12 xl:col-span-12">
+          <div className="rounded-[10px] border border-stroke bg-white p-4 shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card sm:p-7.5">
+            <FinancialTotals data={financialData} />
+          </div>
+        </div> */}
 
         {/* <WeeksProfit
           key={extractTimeFrame("weeks_profit")}
@@ -168,5 +232,13 @@ export default function Home() {
         </Suspense> */}
       </div>
     </>
+  );
+}
+
+export default function Home() {
+  return (
+    <DateFilterProvider>
+      <DashboardContent />
+    </DateFilterProvider>
   );
 }

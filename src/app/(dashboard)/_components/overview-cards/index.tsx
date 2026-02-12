@@ -2,7 +2,7 @@
 
 import { moneyFormat } from "@/lib/format-number";
 import { FinancialData } from "@/types/charts.types";
-import { extractLastMonthData } from "@/lib/financial-data-utils";
+import { calculatePeriodTotals } from "@/lib/financial-data-utils";
 import { OverviewCard } from "./card";
 import * as icons from "./icons";
 
@@ -13,28 +13,28 @@ type OverviewCardsGroupProps = {
 };
 
 export function OverviewCardsGroup({ financialData }: OverviewCardsGroupProps) {
-  // Extract last month values from financial data
-  const lastMonthData = extractLastMonthData(financialData);
+  // Calculate totals for the selected period (year or month)
+  const periodTotals = calculatePeriodTotals(financialData);
 
   // Map financial data to card data structure
   // gross → views, taxes → profit, frsh → products, disc → users
   const views = {
-    value: lastMonthData.gross,
+    value: periodTotals.gross,
     growthRate: 0,
   };
 
   const profit = {
-    value: lastMonthData.taxes,
+    value: periodTotals.taxes,
     growthRate: 0,
   };
 
   const products = {
-    value: lastMonthData.frsh,
+    value: periodTotals.frsh,
     growthRate: 0,
   };
 
   const users = {
-    value: lastMonthData.disc,
+    value: periodTotals.disc,
     growthRate: 0,
   };
 

@@ -23,6 +23,7 @@ interface Settlement {
   created_at: string;
   status: number;
   type: number;
+  hasErrors?: boolean;
 }
 
 interface SettlementsResponse {
@@ -33,15 +34,34 @@ interface SettlementsResponse {
   member: Settlement[];
 }
 
-function getSettlementStatus(status: number){
-  let label = '';
+function getSettlementStatusInfo(status: number) {
   switch(status){
-      case 1000: label = 'Pending'; break;
-      case 2000: label = 'Processing'; break;
-      case 3000: label = 'Done'; break;
+      case 1000: // Pending - light green
+          return {
+              label: 'Pending',
+              styles: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
+          };
+      case 2000: // Processing - blue
+          return {
+              label: 'Processing',
+              styles: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
+          };
+      case 3000: // With Errors - orange
+          return {
+              label: 'With Errors',
+              styles: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400'
+          };
+      case 7000: // Done - current green
+          return {
+              label: 'Done',
+              styles: 'bg-[#219653]/[0.08] text-[#219653] dark:bg-[#219653]/20 dark:text-[#219653]'
+          };
+      default:
+          return {
+              label: 'Unknown',
+              styles: 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+          };
   }
-
-  return label;
 }
 
 export function SettlementsTable() {
@@ -169,9 +189,14 @@ export function SettlementsTable() {
               </TableCell>
 
               <TableCell>
-                <div className="max-w-fit rounded-full bg-[#219653]/[0.08] px-3.5 py-1 text-sm font-medium text-[#219653]">
-                  {getSettlementStatus(settlement.status)}
-                </div>
+                {(() => {
+                  const { label, styles } = getSettlementStatusInfo(settlement.status);
+                  return (
+                    <div className={`max-w-fit rounded-full px-3.5 py-1 text-sm font-medium ${styles}`}>
+                      {label}
+                    </div>
+                  );
+                })()}
               </TableCell>
 
               <TableCell className="xl:pr-7.5">

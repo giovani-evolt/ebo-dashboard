@@ -20,7 +20,7 @@ type InputGroupProps = {
   defaultValue?: string;
   isValid?: boolean;
   isInvalid?: boolean;
-};
+} & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'onBlur' | 'type' | 'placeholder' | 'value' | 'defaultValue' | 'name' | 'required' | 'disabled' | 'className'>;
 
 const InputGroup: React.FC<InputGroupProps> = ({
   className,
@@ -38,6 +38,17 @@ const InputGroup: React.FC<InputGroupProps> = ({
   ...props
 }) => {
   const id = useId();
+  
+  // Extract props that should not be passed to the input
+  const {
+    name,
+    value,
+    defaultValue,
+    iconPosition,
+    fileStyleVariant,
+    height,
+    ...inputProps
+  } = props;
 
   return (
     <div className={className}>
@@ -52,7 +63,7 @@ const InputGroup: React.FC<InputGroupProps> = ({
       <div
         className={cn(
           "relative mt-3 [&_svg]:absolute [&_svg]:top-1/2 [&_svg]:-translate-y-1/2",
-          props.iconPosition === "left"
+          iconPosition === "left"
             ? "[&_svg]:left-4.5"
             : "[&_svg]:right-4.5",
         )}
@@ -60,19 +71,19 @@ const InputGroup: React.FC<InputGroupProps> = ({
         <input
           id={id}
           type={type}
-          name={props.name}
+          name={name}
           placeholder={placeholder}
           onChange={handleChange}
           onBlur={handleBlur}
-          value={props.value}
-          defaultValue={props.defaultValue}
+          value={value}
+          defaultValue={defaultValue}
           className={cn(
             "w-full rounded-lg border-[1.5px] border-stroke bg-transparent outline-none transition focus:border-primary disabled:cursor-default disabled:bg-gray-2 data-[active=true]:border-primary dark:border-dark-3 dark:bg-dark-2 dark:focus:border-primary dark:disabled:bg-dark dark:data-[active=true]:border-primary",
             type === "file"
-              ? getFileStyles(props.fileStyleVariant!)
+              ? getFileStyles(fileStyleVariant!)
               : "px-5.5 py-3 text-dark placeholder:text-dark-6 dark:text-white",
-            props.iconPosition === "left" && "pl-12.5",
-            props.height === "sm" && "py-2.5",
+            iconPosition === "left" && "pl-12.5",
+            height === "sm" && "py-2.5",
             // Visual indicators for valid/invalid fields (Requirement 9.4)
             isValid && "border-green-500 dark:border-green-500",
             isInvalid && "border-red-500 dark:border-red-500",
@@ -80,6 +91,7 @@ const InputGroup: React.FC<InputGroupProps> = ({
           required={required}
           disabled={disabled}
           data-active={active}
+          {...inputProps}
         />
 
         {icon}

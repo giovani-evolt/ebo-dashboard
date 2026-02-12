@@ -12,6 +12,7 @@ const publicRoutes = [
   '/signup',
   '/forgot-password',
   '/reset-password',
+  '/user/confirm',
 ];
 
 // Define protected route patterns
